@@ -1,0 +1,19 @@
+Metric,2015,2025,Paper 2007
+Year,2015,2025,2007 (paper)
+Data type,Cargo+Container,Cargo+Container,All cargo ships
+Nodes N (ports),"7,097","7,717",951
+Directed edges,"188,545","182,300",—
+Undirected edges,"145,745","139,499",—
+Density (undirected),0.005788,0.004686,—
+Mean undirected degree <k>,41.07,36.15,44.61
+Max degree,"1,233","1,171",—
+Clustering coefficient C,0.5223,0.4884,0.490
+C(k) decay exponent beta,0.296,0.273,—
+Avg path length L (sampled GCC),3.2588,3.5650,2.500
+Diameter (from sample),10,14,—
+Assortativity r,-0.0694,-0.0080,—
+KNN slope nu,-0.0145,0.0553,—
+Power-law exponent mu (MLE),1.306,1.314,1.710
+GCC size (% of N),99.8%,99.6%,—
+Small-world sigma,66.1,73.0,—
+Small-world gamma (C/C_rand),90.2,104.2,—

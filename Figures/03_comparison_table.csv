@@ -1,0 +1,27 @@
+Metric,2015,2025,Change
+TOPOLOGY,,,
+Nodes N,"7,097","7,717",+8.7%
+Directed edges,"188,545","182,300",-3.3%
+Undirected edges,"145,745","139,499",-4.3%
+Density (directed),0.003744,0.003062,-18.2%
+Connected components,8,5,-37.5%
+SCCs (directed),219,203,-7.3%
+GCC fraction of N,99.8%,99.6%,
+DEGREE,,,
+Mean undirected degree <k>,41.07,36.15,-12.0%
+Mean in-degree,26.57,23.62,-11.1%
+Max undirected degree,"1,233","1,171",-5.0%
+Degree power-law exponent mu,1.306,1.314,
+CLUSTERING & PATH LENGTH,,,
+Clustering C (unweighted),0.5223,0.4884,-6.5%
+Clustering C (weighted),0.0002,0.0001,-23.4%
+Avg path length L (sampled GCC),3.2889,3.5765,+8.7%
+Assortativity r,-0.0694,-0.0080,+88.5%
+WEIGHTS & TRAFFIC,,,
+Total voyages,"1,791,795","1,965,325",+9.7%
+Mean journeys per link <J>,9.50,10.78,+13.4%
+Max link weight,"10,269","12,779",+24.4%
+Mean node strength <s>,504.9,509.3,+0.9%
+Link weight exponent mu_w,1.643,1.617,
+Strength exponent eta,1.236,1.233,
+Strength-degree scaling alpha,1.408,1.425,

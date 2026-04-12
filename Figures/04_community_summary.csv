@@ -1,0 +1,10 @@
+Metric,2015,2025,Paper 2007
+Detection method,Louvain,Louvain,Louvain
+Number of communities c,28,34,12 (container) / 7 (bulk) / 6 (oil)
+Modularity Q,0.6987,0.7196,0.605 / 0.592 / 0.716
+Largest community (nodes),1990,1735,—
+Smallest community (nodes),2,2,—
+Mean community size,253.5,227.0,—
+Intra-community edge ratio,70.2%,67.6%,—
+Intra-community traffic ratio,84.2%,83.4%,—
+Mean internal density,0.4647,0.3605,—

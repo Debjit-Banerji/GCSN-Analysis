@@ -1,0 +1,17 @@
+Metric,2015,2025,Paper 2007
+Year,2015,2025,2007 (paper)
+Directed edges,"188,545","182,300",—
+Undirected edges,"145,745","139,499",—
+Total voyages (sum of all weights),"1,791,795","1,965,325",—
+Mean journeys per link <J>,9.50,10.78,10.4
+Max link weight,"10,269","12,779",—
+Mean node strength <s>,504.9,509.3,—
+Link weight MLE exponent mu,1.643,1.617,~1.42
+Strength MLE exponent eta,1.236,1.233,1.02
+Strength-degree scaling alpha,1.435,1.346,1.36
+Strength-degree R^2,0.993,0.983,—
+Weighted clustering C_w,0.0002,0.0001,—
+Unweighted clustering C,0.5223,0.4884,0.49
+Assortativity r (undirected),-0.0694,-0.0080,—
+"Assortativity r (in-in, directed)",-0.0542,0.0024,—
+"Assortativity r (out-out, directed)",-0.0557,-0.0053,—
