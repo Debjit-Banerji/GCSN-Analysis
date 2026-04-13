@@ -1,0 +1,30 @@
+Comm ID,Top port (hub),Size,Inflow,Outflow,Balance,Balance %,Role
+3,mys-telokramunia,760,47716,46972,744,0.8,net importer
+8,bra-santos,255,12517,12318,199,0.8,net importer
+28,pan-manzanillo,753,12974,12834,140,0.5,net importer
+23,tur-istanbul,1146,20621,20516,105,0.3,net importer
+11,aus-geelong,228,6320,6227,93,0.7,net importer
+15,can-thorold,146,1765,1693,72,2.1,net importer
+4,chn-guangzhou,244,58175,58152,23,0.0,net importer
+0,rus-astrakhan,244,939,926,13,0.7,net importer
+1,prt-praiadavitoria,9,33,31,2,3.1,net importer
+21,chl-chl-55,39,144,142,2,0.7,net importer
+29,usa-marco,4,3,2,1,20.0,net importer
+18,chn-chn-2573,8,12,11,1,4.3,net importer
+10,cri-puntaarenas,3,1,1,0,0.0,balanced
+27,usa-herringtonsout,3,0,0,0,0.0,balanced
+30,usa-juneau,20,0,0,0,0.0,balanced
+32,pyf-pyf-65,21,1,1,0,0.0,balanced
+25,aus-paynesville,4,0,0,0,0.0,balanced
+24,gbr-stromness,11,12,12,0,0.0,balanced
+14,fin-fin-26,16,8,8,0,0.0,balanced
+17,hrv-split,106,305,306,-1,-0.2,net exporter
+19,aut-feldkirchenand,267,210,211,-1,-0.2,net exporter
+33,ecu-ayoraanchorage,25,43,44,-1,-1.1,net exporter
+22,grl-nuuk,19,39,40,-1,-1.3,net exporter
+9,phl-manila,96,5616,5627,-11,-0.1,net exporter
+7,kor-busan,331,36757,36813,-56,-0.1,net exporter
+20,nld-rotterdammaasv,1735,16212,16303,-91,-0.3,net exporter
+6,jpn-kobe,304,25993,26221,-228,-0.4,net exporter
+12,chn-tongling,468,5641,5993,-352,-3.0,net exporter
+5,chn-shanghai,442,73433,74090,-657,-0.4,net exporter

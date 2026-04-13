@@ -1,0 +1,23 @@
+Comm ID,Top port (hub),Size,Inflow,Outflow,Balance,Balance %,Role
+6,bra-santos,311,13183,12978,205,0.8,net importer
+15,nld-rotterdammaasv,1990,18313,18161,152,0.4,net importer
+8,mys-pengerang,715,39473,39374,99,0.1,net importer
+3,chn-haikou,406,57377,57287,90,0.1,net importer
+4,aus-geelong,192,6123,6036,87,0.7,net importer
+9,pan-manzanillo,765,12762,12683,79,0.3,net importer
+13,can-thorold,155,1631,1581,50,1.6,net importer
+7,tur-istanbul,970,21063,21044,19,0.0,net importer
+18,rus-bykovsky,6,4,3,1,14.3,net importer
+14,grl-nuuk,14,47,47,0,0.0,balanced
+17,fin-mariehamn,10,36,36,0,0.0,balanced
+19,chn-chn-376,8,15,15,0,0.0,balanced
+16,ven-ven-3,3,4,4,0,0.0,balanced
+12,svk-gabcikovo,148,93,93,0,0.0,balanced
+26,aus-cowancreek,4,0,0,0,0.0,balanced
+27,ven-ciudadojeda,6,1,2,-1,-33.3,net exporter
+5,irl-rosslare,6,92,93,-1,-0.5,net exporter
+10,prt-praiadavitoria,8,20,22,-2,-4.8,net exporter
+1,ind-ind-na,4,14,17,-3,-9.7,net exporter
+11,rus-astrakhan,60,274,325,-51,-8.5,net exporter
+2,jpn-yokohama,615,41421,41774,-353,-0.4,net exporter
+0,chn-shanghai,689,71022,71393,-371,-0.3,net exporter
