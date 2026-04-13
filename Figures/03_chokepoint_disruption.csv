@@ -1,0 +1,21 @@
+chokepoint,year,port_id,degree,delta_gcc_pct,delta_apl
+Singapore,2015,sgp-singapore,827,0.014,0.0304
+Singapore,2025,sgp-singapore,771,0.026,0.0067
+Rotterdam,2015,nld-rotterdam,620,0.0,0.0467
+Rotterdam,2025,nld-rotterdam,520,0.039,0.0151
+Shanghai,2015,chn-shanghai,1233,0.113,0.0444
+Shanghai,2025,chn-shanghai,1171,0.065,0.0219
+Port Said,2015,egy-portsaid,504,0.0,0.0205
+Port Said,2025,egy-portsaid,474,0.013,0.0046
+Busan,2015,kor-busan,588,0.0,0.0277
+Busan,2025,kor-busan,551,0.013,0.0027
+Dubai,2015,are-dubai,139,0.014,0.0164
+Dubai,2025,are-dubai,148,0.039,-0.0106
+Colombo,2015,lka-colombo,254,0.0,0.0194
+Colombo,2025,lka-colombo,264,0.0,-0.0022
+Hong Kong,2015,hkg-hongkong,117,0.014,0.0249
+Hong Kong,2025,hkg-hongkong,8,0.0,-0.0101
+Los Angeles,2015,(not found),0,,
+Los Angeles,2025,(not found),0,,
+Hamburg,2015,deu-hamburg,228,0.028,0.0174
+Hamburg,2025,deu-hamburg,215,0.013,0.0041

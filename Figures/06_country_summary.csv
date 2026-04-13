@@ -1,0 +1,10 @@
+Metric,2015,2025,% Change / Note
+Countries (nodes),201,203,+1.0%
+Directed edges,7417,7431,+0.2%
+Mean degree ⟨k⟩,45.68,45.43,—
+Reciprocity,0.7620,0.7590,—
+Clustering C,0.7033,0.7067,—
+GCC size (%),100.0%,100.0%,—
+Communities (Louvain),8,7,—
+Modularity Q,0.5656,0.5861,—
+Top country (strength),China,China,—

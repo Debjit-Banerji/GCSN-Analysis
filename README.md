@@ -36,11 +36,12 @@ GCSN-Analysis/
 ├── README.md                        ← This file
 ├── Codes/
 │   ├── data_extraction.ipynb        ← GFW API data pull + edge-list builder
-│   ├── 01_EDA_unweighted.ipynb      ← Unweighted graph: degree distribution, BC
-│   ├── 02_EDA_weighted.ipynb        ← Weighted graph: Table 1 replication, Fig 2
-│   ├── 03_temporal_analysis.ipynb   ← 2015 vs 2025 structural comparison
+│   ├── 01_EDA_unweighted.ipynb      ← Unweighted graph: degree, BC, PageRank, k-core
+│   ├── 02_EDA_weighted.ipynb        ← Weighted graph: Table 1, Fig 2, specialisation
+│   ├── 03_temporal_analysis.ipynb   ← 2015 vs 2025: structure, chokepoints, robustness
 │   ├── 04_community_analysis.ipynb  ← Community detection and quality metrics
-│   └── 05_motif_analysis.ipynb      ← Triadic census and motif Z-scores
+│   ├── 05_motif_analysis.ipynb      ← Triadic census and motif Z-scores
+│   └── 06_country_level_analysis.ipynb ← Country-level aggregation and trade patterns
 ├── EdgeList/
 │   ├── shipping_network_2015.csv
 │   └── shipping_network_2025.csv
@@ -80,6 +81,8 @@ Treats the edge list as a simple (unweighted) directed graph. Constructs both di
 | 8 | Hub identification: top-25 ports by degree |
 | 9 | Reciprocity overview |
 | 10 | Betweenness centrality: top-25 ports, BC vs degree correlation |
+| 11 | PageRank centrality: gateway ports, PR vs BC vs degree rank-correlation |
+| 12 | k-core decomposition: shell structure, innermost core ports, coreness distribution |
 
 **Degree distribution fitting (Kaluza-faithful):**
 - Power-law: MLE exponent α via Clauset et al. (2009), R² in log-log space
@@ -94,6 +97,8 @@ Treats the edge list as a simple (unweighted) directed graph. Constructs both di
 **Key output files:**
 - `Figures/01_degree_distribution_2015.png`, `01_degree_distribution_2025.png`
 - `Figures/01_betweenness_centrality.csv`
+- `Figures/01_pagerank_2015.png`, `01_pagerank_2025.png`, `01_pagerank.csv`
+- `Figures/01_kcore_decomposition.png`, `01_kcore.csv`
 
 ---
 
@@ -114,6 +119,7 @@ Adds edge weights (voyage counts) to produce a weighted directed graph.
 | 9 | Weighted betweenness centrality |
 | 10 | Kaluza Table 1 full replication |
 | 11 | Composite Fig 2b–d replication |
+| 12 | Port trade specialisation: in/out-strength asymmetry index, net exporters vs importers |
 
 **Table 1 replication** (`full_table1_metrics()`):
 Reproduces all metrics from Table 1 of the paper for both years:
@@ -154,7 +160,8 @@ Systematically compares network structure across the decade.
 | 11 | Traffic concentration (Gini coefficient + Lorenz curves) |
 | 12 | Network robustness: targeted vs random node removal |
 | 13 | Reciprocity & weight directionality |
-| 14 | Visual summary dashboard |
+| 15 | Chokepoint / strategic disruption analysis: named ports (Singapore, Rotterdam, etc.) |
+| 16 | Visual summary dashboard |
 
 **Selected methodological details:**
 
@@ -254,6 +261,40 @@ Z_i = (X_real_i - mean(X_rand_i)) / std(X_rand_i)
 
 ---
 
+### `06_country_level_analysis.ipynb` — Country-Level Cargo Network
+
+Aggregates the port-level edge list to a **country-to-country network** by parsing the 3-letter ISO prefix from each GFW port ID (e.g. `chn-shanghai` → `CHN`). Provides a macro-scale view of global trade structure.
+
+| Section | Content |
+|---------|---------|
+| 1 | Build country-level directed + undirected weighted graphs |
+| 2 | Basic statistics: N countries, E edges, density, clustering, reciprocity |
+| 3 | Top 20 countries by shipping strength (bar chart) |
+| 4 | Strength and degree CCDF (complementary CDF) |
+| 5 | Temporal comparison: which countries gained/lost importance 2015→2025 |
+| 6 | Country flow balance: net importer vs exporter (asymmetry index per country) |
+| 7 | Louvain community detection: macro trade blocs, modularity Q |
+| 8 | PageRank + betweenness centrality at country level |
+| 9 | Country-level Gini coefficient and Lorenz curves |
+| 10 | Summary table |
+
+**Key features:**
+- GFW port prefixes cover ~150 country codes; unmapped codes fall back to uppercase ISO display
+- Country-level network is much smaller (~150 nodes vs ~7,000) so exact betweenness is feasible
+- Communities at this level correspond to recognisable **geopolitical trade blocs** (East Asia, Europe, Persian Gulf, Americas)
+
+**Key output files:**
+- `Figures/06_top_countries_strength.png`
+- `Figures/06_country_distributions.png`
+- `Figures/06_country_temporal_change.png`
+- `Figures/06_country_flow_balance_2015.png`, `06_country_flow_balance_2025.png`
+- `Figures/06_country_communities.png`
+- `Figures/06_country_pagerank.png`
+- `Figures/06_country_lorenz.png`
+- `Figures/06_country_summary.csv`
+
+---
+
 ## Methodology Summary
 
 ### Graph Construction
@@ -300,11 +341,19 @@ Sampled BFS from 400–500 random LCC nodes; mean over all reachable pairs.
 | `01_degree_distribution_2015.png` | 01 | P(k) with power-law and exponential fits |
 | `01_degree_distribution_2025.png` | 01 | P(k) with power-law and exponential fits |
 | `01_betweenness_centrality.csv` | 01 | Top-25 BC ports with degree ranks |
+| `01_pagerank_2015.png`, `01_pagerank_2025.png` | 01 | Top-25 ports by PageRank, rank correlation |
+| `01_pagerank.csv` | 01 | PageRank scores for all ports, both years |
+| `01_kcore_decomposition.png` | 01 | k-shell size distribution, cumulative core, coreness scatter |
+| `01_kcore.csv` | 01 | Coreness per port, both years |
 | `02_table1_replication.csv` | 02 | All Table 1 metrics vs paper baselines |
 | `02_fig2_composite_replication.png` | 02 | P(w), P(s), ⟨s(k)⟩ side-by-side |
+| `02_port_specialisation_2015.png`, `_2025.png` | 02 | In/out-strength scatter + asymmetry bar chart |
+| `02_port_specialisation.csv` | 02 | Per-port asymmetry index, both years |
 | `03_distributions_overlay.png` | 03 | Degree/strength distributions 2015 vs 2025 |
 | `03_lorenz_curves.png` | 03 | Lorenz curves + Gini for weights/strengths/degrees |
 | `03_robustness_curves.png` | 03 | GCC fraction under targeted and random removal |
+| `03_chokepoint_disruption.png` | 03 | GCC drop + APL increase per named chokepoint |
+| `03_chokepoint_disruption.csv` | 03 | Numerical results for all chokepoints |
 | `03_summary_dashboard.png` | 03 | Bar + radar charts of % metric changes |
 | `04_community_sizes.png` | 04 | Community size distribution histogram |
 | `04_inter_community_heatmap.png` | 04 | Raw + row-normalised inter-community traffic |
@@ -314,6 +363,14 @@ Sampled BFS from 400–500 random LCC nodes; mean over all reachable pairs.
 | `05_triadic_census_all.png` | 05 | All 15 triad types, 2015 vs 2025 grouped bars |
 | `05_motif_zscores_paper13.png` | 05 | Paper's 13 triad types with Z-score colouring |
 | `05_normalised_frequencies.png` | 05 | Normalised triad frequencies (log scale) |
+| `06_top_countries_strength.png` | 06 | Top 20 countries by shipping strength, 2015 & 2025 |
+| `06_country_distributions.png` | 06 | Strength and degree CCDF at country level |
+| `06_country_temporal_change.png` | 06 | Scatter + bar of country strength change 2015→2025 |
+| `06_country_flow_balance_2015.png`, `_2025.png` | 06 | Country-level net importer/exporter asymmetry |
+| `06_country_communities.png` | 06 | Trade bloc community sizes |
+| `06_country_pagerank.png` | 06 | Top 20 countries by PageRank |
+| `06_country_lorenz.png` | 06 | Lorenz curves for country-level concentration |
+| `06_country_summary.csv` | 06 | Full country-level summary statistics |
 
 ---
 
@@ -356,6 +413,7 @@ data_extraction.ipynb       # Only needed if regenerating edge lists from GFW AP
 03_temporal_analysis.ipynb
 04_community_analysis.ipynb
 05_motif_analysis.ipynb
+06_country_level_analysis.ipynb
 ```
 
 Each notebook reads from `../EdgeList/` and writes figures/tables to `../Figures/`. The `Figures/` directory is created automatically if it does not exist.
@@ -369,6 +427,7 @@ Each notebook reads from `../EdgeList/` and writes figures/tables to `../Figures
 | 03_temporal_analysis | ~5–10 min (robustness curves × 4) |
 | 04_community_analysis | ~3–5 min |
 | 05_motif_analysis | ~30–60 min (100 null-model randomisations) |
+| 06_country_level_analysis | ~1–2 min (small graph, exact algorithms) |
 
 ---
 
