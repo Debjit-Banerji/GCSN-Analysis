@@ -1,0 +1,1638 @@
+% ====================================================================
+%  Global Cargo Ship Network Analysis
+%  Authors: Aditya Gupta (2022031) & Debjit Banerji (2022146)
+%  IIIT Delhi — Network Science Course Project, April 2026
+%  Style: two-column, modelled on J. R. Soc. Interface (Kaluza 2010)
+% ====================================================================
+\documentclass[a4paper,10pt,twocolumn]{article}
+
+% ── Fonts & encoding ─────────────────────────────────────────────────
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathptmx}           % Times Roman body + math
+\usepackage[scaled=0.90]{helvet}
+\usepackage{microtype}
+
+% ── Page geometry ────────────────────────────────────────────────────
+\usepackage[a4paper,
+            top=2.2cm, bottom=2.5cm,
+            left=1.8cm, right=1.8cm,
+            columnsep=0.65cm]{geometry}
+
+% ── Colors ───────────────────────────────────────────────────────────
+\usepackage[dvipsnames,table]{xcolor}
+\definecolor{NavyHead}{RGB}{15,52,96}
+\definecolor{TealLine}{RGB}{0,119,182}
+\definecolor{TableH}{RGB}{218,232,247}
+
+% ── Math ─────────────────────────────────────────────────────────────
+\usepackage{amsmath,amssymb}
+
+% ── Graphics ─────────────────────────────────────────────────────────
+\usepackage{graphicx}
+\usepackage{subcaption}
+% stfloats allows figure*[b]; must load before float
+\usepackage{stfloats}
+\usepackage{float}
+\captionsetup{font=small,labelfont=bf,labelsep=period,
+              skip=5pt,width=\linewidth}
+\captionsetup[subfigure]{font=small,labelfont=normalfont,
+              labelformat=simple,labelsep=space}
+\renewcommand\thesubfigure{(\alph{subfigure})}
+
+% ── Tables ───────────────────────────────────────────────────────────
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{colortbl}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+
+% ── Section headings (Interface style) ───────────────────────────────
+\usepackage{titlesec}
+\titleformat{\section}
+  {\normalfont\fontsize{9}{11}\bfseries\selectfont}
+  {\thesection.}{0.4em}{\MakeUppercase}
+\titleformat{\subsection}
+  {\normalfont\fontsize{9}{11}\itshape\selectfont}
+  {\thesubsection.}{0.4em}{}
+\titleformat{\subsubsection}
+  {\normalfont\fontsize{9}{11}\itshape\selectfont}
+  {\thesubsubsection.}{0.4em}{}
+\titlespacing*{\section}{0pt}{9pt plus 2pt minus 1pt}{3pt}
+\titlespacing*{\subsection}{0pt}{7pt plus 1pt}{2pt}
+\titlespacing*{\subsubsection}{0pt}{5pt plus 1pt}{2pt}
+
+% ── Header / footer ──────────────────────────────────────────────────
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\fontsize{8}{9}\selectfont\itshape
+  Complex network of global cargo ship movements}
+\fancyhead[R]{\fontsize{8}{9}\selectfont\itshape
+  Gupta \& Banerji}
+\fancyfoot[C]{\fontsize{8}{9}\selectfont\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\setlength{\headheight}{12pt}
+
+% ── References ───────────────────────────────────────────────────────
+\usepackage[authoryear,round,sort&compress]{natbib}
+\bibpunct{(}{)}{;}{a}{,}{,}
+\setlength{\bibsep}{2pt}
+\renewcommand{\bibfont}{\small}
+
+% ── Hyperlinks ───────────────────────────────────────────────────────
+\usepackage[colorlinks=true,
+            linkcolor=TealLine,
+            citecolor=NavyHead,
+            urlcolor=TealLine,
+            bookmarks=true]{hyperref}
+
+% ── Float parameters for two-column ─────────────────────────────────
+\setlength{\dbltextfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\dblfloatsep}{6pt plus 2pt minus 2pt}
+\renewcommand{\dbltopfraction}{0.92}
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\floatpagefraction}{0.80}
+\renewcommand{\dblfloatpagefraction}{0.80}
+
+% ── Misc ─────────────────────────────────────────────────────────────
+\usepackage{enumitem}
+\setlist[itemize]{leftmargin=1.2em,itemsep=1pt,parsep=0pt,topsep=2pt}
+\setlist[enumerate]{leftmargin=1.4em,itemsep=1pt,parsep=0pt,topsep=2pt}
+\usepackage{parskip}
+\setlength{\parskip}{3pt}
+\setlength{\parindent}{0pt}
+
+% ── Full-width strip for title/abstract ──────────────────────────────
+\usepackage{cuted}   % \strip environment
+
+% ====================================================================
+\begin{document}
+\thispagestyle{empty}
+% ====================================================================
+
+% ── Full-width header banner ─────────────────────────────────────────
+\begin{strip}
+  \vspace*{-6pt}
+  {\fontsize{7.5}{9}\selectfont
+    \textit{Network Science Course Project, IIIT Delhi} \hfill
+    \textit{April 2026}}\\[-3pt]
+  \rule{\linewidth}{0.5pt}
+  \vspace{2pt}
+\end{strip}
+
+% ── Full-width title block ────────────────────────────────────────────
+\twocolumn[{%
+\begin{@twocolumnfalse}
+  \begin{center}
+    {\fontsize{17}{21}\bfseries\selectfont
+      The complex network of global cargo ship\\[3pt]
+      movements: a 2015--2025 replication and extension\par}
+    \vspace{9pt}
+    {\fontsize{10.5}{13}\bfseries\selectfont
+      Aditya Gupta and Debjit Banerji\par}
+    \vspace{3pt}
+    {\fontsize{9}{11}\itshape\selectfont
+      Department of Computer Science and Engineering,
+      Indraprastha Institute of Information Technology Delhi
+      (IIIT-D),\\
+      Okhla Phase III, New Delhi 110020, India\\
+      Roll Nos: 2022031 (A. Gupta) \& 2022146 (D. Banerji)\par}
+    \vspace{10pt}
+  \end{center}
+  %
+  % Abstract
+  {\fontsize{9}{12}\selectfont
+  We replicate and substantially extend the landmark study of
+  \citet{Kaluza2010} on the global cargo ship network (GCSN)
+  using open vessel-tracking data from the Global Fishing Watch
+  (GFW) API for two temporal snapshots---2015 and 2025.
+  Our port-to-port networks comprise 7\,097 and 7\,717 ports
+  connected by up to 188\,545 directed edges encoding individual
+  voyage counts.
+  We characterise both networks as \emph{small-world}
+  (clustering $C\approx0.52$, average path length $L\approx3.3$,
+  small-world coefficient $\sigma\approx66$--73) with exponentially
+  distributed degree sequences and superlinear strength--degree
+  scaling ($\alpha\approx1.4$), closely replicating
+  Kaluza~et~al.'s findings despite an entirely different data source.
+  Comparing 2015 to 2025, total voyages \emph{increased} by 9.7\%
+  while the number of routes fell 3.3\% and mean degree fell 12.0\%,
+  revealing a traffic-concentration paradox consistent with
+  mega-vessel deployment.
+  Modularity increased ($Q:0.699\to0.720$) and Louvain detection
+  reveals 28--34 geographically coherent communities,
+  50\% of which are stable over the decade.
+  Triadic census analysis confirms strong over-representation of
+  clique-like motifs.
+  We add PageRank and k-core centrality, port trade specialisation,
+  strategic chokepoint disruption, and a country-level network
+  aggregation.
+  Shanghai is the most critical single chokepoint;
+  China dominates the country-level network in both years.\par}
+  \vspace{6pt}
+  {\fontsize{9}{11}\selectfont
+  \textbf{Keywords:}\ complex network; cargo ships;
+  small-world network; community detection;
+  temporal analysis; network resilience\par}
+  \vspace{12pt}
+  \rule{\linewidth}{0.4pt}
+  \vspace{6pt}
+\end{@twocolumnfalse}
+}]
+
+% ====================================================================
+\section{Introduction}
+% ====================================================================
+
+Maritime shipping carries over 80\,per cent of world trade by volume
+\citep{UNCTAD2023}.
+The global cargo ship network (GCSN)---where nodes are ports and
+directed weighted edges are voyage counts---is one of Earth's most
+critical infrastructure systems, central to logistics, pandemic
+preparedness, and supply-chain risk management.
+
+By 2006, 7.4 billion tonnes of goods were handled at the world's
+ports \citep{IMO2006}, and the GCSN also acts as a vector for
+invasive species through ballast water and hull fouling
+\citep{Kaluza2010}.
+
+\citet{Kaluza2010} analysed Lloyd's Register data from 2007 and
+characterised the GCSN over 951 ports as a small-world network
+\citep{Watts1998} with rich community structure and superlinear
+strength--degree scaling $\langle s(k)\rangle\!\sim\!k^{1.36}$.
+\citet{Hu2009} independently analysed the worldwide maritime
+transportation network using Lloyd's data and reached similar
+structural conclusions, further motivating the present replication.
+Since then, shipping volumes have grown substantially and
+disruptions---the COVID-19 pandemic (2020), the Russia--Ukraine
+conflict (2022), and the 2021 Suez Canal blockage---have reshaped
+routes.
+
+This project addresses two questions:
+(i)~\textit{Replication}---do the structural properties of
+\citet{Kaluza2010} hold for GFW-derived data in 2015?
+(ii)~\textit{Evolution}---how has topology, resilience and community
+structure changed from 2015 to 2025?
+Beyond replication, five extensions are presented: PageRank and
+k-core centrality, port trade specialisation, strategic chokepoint
+disruption, comprehensive temporal analysis, and a country-level
+aggregation inspired by \citet{Ducruet2022} and \citet{Liu2025}.
+
+% ====================================================================
+\section{Data}
+% ====================================================================
+
+Port-visit events were downloaded from the \textbf{Global Fishing
+Watch (GFW) API} for vessel types \texttt{CARGO} and
+\texttt{CONTAINER} for calendar years 2015 and 2025.
+For each vessel, events were sorted by entry time, consecutive
+duplicate ports removed (suppress trivial self-loops), and
+sequential port pairs extracted to form a directed weighted edge list
+(source, destination, voyage~count).
+
+\begin{table}[t]
+\centering
+\caption{Dataset overview.}
+\label{tab:data}
+{\small
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\rowcolor{TableH}
+\textbf{Year} & \textbf{Unique ports} & \textbf{Directed edges} \\
+\midrule
+2015 & 7,097 & 188,545 \\
+2025 & 7,717 & 182,300 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+The Automatic Identification System (AIS), adopted from 2012, enables
+GFW to aggregate real-time vessel positions into port-visit events
+globally---the open-data equivalent of Lloyd's Register.
+
+% ====================================================================
+\section{Network construction}
+% ====================================================================
+
+From each edge list, four graph variants are derived:
+$G_d$ (directed unweighted), $G_u$ (undirected unweighted),
+$G_d^w$ (directed, edge weight = voyage count), and
+$G_u^w$ (undirected, weight = sum of both directions).
+All analysis uses NetworkX \citep{Hagberg2008}.
+The directed networks have reciprocity $\approx\!0.45$: $\sim$59\%
+of linked port pairs have edges in both directions, confirming
+most routes operate bi-directionally though not with equal frequency.
+
+% ====================================================================
+\section{Unweighted structural analysis}
+% ====================================================================
+
+\subsection{Summary statistics}
+
+Table~\ref{tab:summary} reports key metrics alongside the
+\citet{Kaluza2010} baseline.
+Both years exhibit a giant connected component (GCC) covering
+$>99.5\%$ of all ports.
+The clustering coefficient $C=0.522$ (2015) closely replicates
+the paper's $C=0.49$.
+The longer path length ($L=3.26$ vs.\ $2.50$) reflects the much
+larger port universe (7\,097 vs.\ 951 ports): seven times more ports
+increase absolute hop distances even when routing efficiency is
+similar.
+The small-world coefficient $\sigma\approx66$--73 confirms clustering
+exceeds a random null by two orders of magnitude while path length
+is only marginally longer.
+
+\begin{table*}[t]
+\centering
+\caption{Unweighted network summary: 2015, 2025, and the
+  \citeauthor{Kaluza2010} 2007 baseline.}
+\label{tab:summary}
+{\small
+\begin{tabularx}{\textwidth}{@{}lCCC@{}}
+\toprule
+\rowcolor{TableH}
+\textbf{Metric} & \textbf{2015} & \textbf{2025} & \textbf{2007\,$^\dagger$} \\
+\midrule
+Nodes $N$                              & 7\,097   & 7\,717   & 951    \\
+Directed edges                         & 188\,545 & 182\,300 & ---    \\
+Undirected edges                       & 145\,745 & 139\,499 & ---    \\
+GCC fraction                           & 99.8\%   & 99.6\%   & ---    \\
+Mean degree $\langle k\rangle$         & 41.07    & 36.15    & 44.61  \\
+Max degree                             & 1\,233   & 1\,171   & ---    \\
+Mean in-degree                         & 26.57    & 23.62    & ---    \\
+Clustering $C$                         & 0.5223   & 0.4884   & 0.490  \\
+$C(k)$ decay exponent $\beta$          & 0.296    & 0.273    & ---    \\
+Avg path length $L$                    & 3.26     & 3.57     & 2.50   \\
+Diameter (sampled)                     & 10       & 14       & ---    \\
+Assortativity $r$                      & $-$0.069 & $-$0.008 & ---    \\
+KNN slope $\nu$                        & $-$0.014 & $+$0.055 & ---    \\
+Degree exponent $\mu$ (MLE)            & 1.306    & 1.314    & 1.710  \\
+Small-world $\sigma$                   & 66.1     & 73.0     & ---    \\
+Small-world $\gamma$\;($C/C_\text{rand}$) & 90.2  & 104.2    & ---    \\
+\bottomrule
+\multicolumn{4}{@{}p{\textwidth}@{}}{\footnotesize
+  $^\dagger$\citet{Kaluza2010}, combined cargo network.}
+\end{tabularx}}
+\end{table*}
+
+\subsection{Degree distribution}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/01_degree_distribution.png}
+  \caption{Degree distribution $P(k)$ for 2015 and 2025 in log--log
+    (top row) and log-linear (bottom row) space, with MLE power-law
+    (red dashed) and OLS exponential (blue solid) fits.}
+  \label{fig:degree}
+\end{figure*}
+
+Figure~\ref{fig:degree} shows that $P(k)$ in log-linear space is
+well-described by a straight line, confirming an exponential rather
+than a power-law distribution.
+The MLE exponent $\mu\approx1.31$ yields $R^2<0.85$ in log-log space
+whereas the exponential achieves $R^2>0.95$ in log-linear space.
+MLE fitting follows \citet{Clauset2009}.
+This is fully consistent with \citet{Kaluza2010}'s conclusion that
+the GCSN is \textit{not} scale-free: unlike social networks or the
+internet, shipping routes are constrained by physical geography and
+commercial economics that impose a characteristic connectivity scale.
+
+\subsection{Clustering and hierarchical structure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/01_clustering.png}
+  \caption{Clustering coefficient $C(k)$ vs.\ degree $k$ (log--log)
+    for 2015 and 2025.
+    Negative slope $\beta\approx0.29$--$0.30$ confirms hierarchical
+    organisation \citep{Ravasz2002}.}
+  \label{fig:clustering}
+\end{figure}
+
+The decaying $C(k)$ profile (figure~\ref{fig:clustering}) with
+$\beta\approx0.29$--$0.30$ confirms hierarchical organisation in both
+years: peripheral ports form dense local clusters while high-degree
+hubs bridge communities with sparser local neighbourhoods
+\citep{Ravasz2002}.
+The slight drop from $C=0.522$ to $0.488$ is consistent with
+peripheral route loss---when low-degree ports lose links, their
+triangular connections disappear proportionally more.
+
+\subsection{Path length distribution}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/01_path_length.png}
+  \caption{Shortest-path length distributions sampled from the GCC
+    (200 random source nodes).
+    Both distributions peak at $L=3$; the 2025 distribution is
+    shifted right (mean 3.57 vs.\ 3.26), reflecting sparser
+    connectivity.}
+  \label{fig:pathlen}
+\end{figure}
+
+Both distributions peak at $L=3$ (figure~\ref{fig:pathlen}),
+confirming the small-world property: almost any two ports in the
+world are connected within three intermediate stops.
+The rightward shift of the 2025 distribution is a direct consequence
+of the $-12\%$ decline in mean degree: fewer edges means slightly
+longer routes, even though the network retains its overall
+small-world character.
+
+\subsection{Degree--degree correlations}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/01_knn.png}
+  \caption{Average nearest-neighbour degree $k_\text{nn}(k)$
+    vs.\ $k$ (log--log).
+    The slope $\nu$ changes sign from $-0.014$ (2015) to $+0.055$
+    (2025), indicating a shift toward assortative mixing.}
+  \label{fig:knn}
+\end{figure}
+
+The KNN profile (figure~\ref{fig:knn}) reveals a sign change in the
+degree-mixing slope between 2015 ($\nu=-0.014$, weak
+disassortativity) and 2025 ($\nu=+0.055$, mild assortativity).
+This shift---and the accompanying assortativity change from
+$r=-0.069$ to $r=-0.008$ \citep{Newman2002}---suggests that by 2025
+the network periphery has thinned, leaving mainly hub-to-hub
+connections that drive the network toward assortative mixing.
+
+\subsection{Rich-club coefficient}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/01_rich_club.png}
+  \caption{Rich-club coefficient $\phi(k)$ vs.\ degree $k$.
+    The sharp rise for $k>200$ indicates a strong rich-club
+    effect: the highest-degree ports form a dense mutual core.}
+  \label{fig:richclub}
+\end{figure}
+
+The sharp rise in $\phi(k)$ above $k=200$ (figure~\ref{fig:richclub})
+confirms a strong rich-club effect: top-tier hubs such as Shanghai,
+Rotterdam, and Singapore are densely interconnected, forming the
+backbone of the global shipping system.
+This hub-and-spoke architecture is the structural complement of the
+hierarchical clustering pattern observed in $C(k)$.
+
+\subsection{Top ports by degree}
+
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/01_top_ports_2015.png}
+    \caption{2015}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/01_top_ports_2025.png}
+    \caption{2025}
+  \end{subfigure}
+  \caption{Top-25 ports by undirected degree for (\textit{a})~2015
+    and (\textit{b})~2025.}
+  \label{fig:topports}
+\end{figure*}
+
+Shanghai, Rotterdam--Maasvlakte, and Antwerp consistently occupy the
+top tier in both years.
+A notable shift is Pengerang (Malaysia) dropping sharply from a
+high 2015 rank by 2025---linked to downstream refinery schedule
+changes in Southeast Asia.
+Conversely, St.\,Petersburg and Skagen rise, reflecting increased
+Baltic Sea traffic.
+The 2025 ranking is moderately more compressed (max degree
+$1171$ vs.\ $1233$), consistent with overall route consolidation.
+
+% ====================================================================
+\section{Weighted analysis}
+% ====================================================================
+
+\subsection{Link weight and strength distributions}
+
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/02_weight_distribution.png}
+    \caption{Link weight $P(w)$}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/02_strength_distribution.png}
+    \caption{Node strength $P(s)$}
+  \end{subfigure}
+  \caption{Heavy-tailed distributions of (\textit{a})~link weight
+    and (\textit{b})~node strength in log--log space.
+    MLE fits give $\mu\approx1.64$ and $\eta\approx1.24$.}
+  \label{fig:weightdist}
+\end{figure*}
+
+Both distributions are heavy-tailed (figure~\ref{fig:weightdist}):
+a few extremely busy routes and a handful of dominant hub ports
+account for a disproportionate share of total traffic.
+The weight exponent $\mu=1.643$ (2015) lies within the range
+$1.42$--$1.93$ reported by \citet{Kaluza2010} for individual cargo
+sub-types.
+The strength exponent $\eta=1.236$ is slightly higher than the
+paper's $1.02$--$1.05$, attributable to the larger port universe
+in our dataset.
+
+\subsection{Kaluza et al.\ figure 2 replication}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/02_fig2_composite_replication.png}
+  \caption{Replication of \citet{Kaluza2010} figure~2b--d.
+    (\textit{a})~Link-weight distribution $P(w)$.
+    (\textit{b})~Node-strength distribution $P(s)$.
+    (\textit{c})~Mean strength per degree $\langle s(k)\rangle\sim k^\alpha$.
+    Steelblue = 2015; orange = 2025.}
+  \label{fig:composite}
+\end{figure*}
+
+Figure~\ref{fig:composite} and table~\ref{tab:weighted} constitute a
+full replication of Kaluza et~al.'s Table~1.
+The strength--degree scaling exponent $\alpha=1.435$ (2015) and
+$\alpha=1.346$ (2025) bracket the paper's $\alpha=1.36$:
+highly-connected ports carry disproportionately more traffic.
+The excellent fit ($R^2>0.98$) confirms superlinear traffic
+concentration at network hubs in both years.
+
+\begin{table*}[t]
+\centering
+\caption{Weighted network metrics: replication of
+  \citeauthor{Kaluza2010} Table~1.}
+\label{tab:weighted}
+{\small
+\begin{tabularx}{\textwidth}{@{}lCCC@{}}
+\toprule
+\rowcolor{TableH}
+\textbf{Metric} & \textbf{2015} & \textbf{2025} & \textbf{2007\,$^\dagger$} \\
+\midrule
+Total voyages                              & 1\,791\,795 & 1\,965\,325 & ---  \\
+Mean journeys/link $\langle J\rangle$      & 9.50        & 10.78       & 10.4 \\
+Max link weight                            & 10\,269     & 12\,779     & ---  \\
+Mean strength $\langle s\rangle$           & 504.9       & 509.3       & ---  \\
+Weight exponent $\mu$                      & 1.643       & 1.617       & $\approx$1.42 \\
+Strength exponent $\eta$                   & 1.236       & 1.233       & 1.02 \\
+Strength--degree exponent $\alpha$         & 1.435       & 1.346       & 1.36 \\
+$s$--$k$ scaling $R^2$                     & 0.993       & 0.983       & ---  \\
+Weighted clustering $C_w$                  & 0.0002      & 0.0001      & ---  \\
+\bottomrule
+\multicolumn{4}{@{}p{\textwidth}@{}}{\footnotesize
+  $^\dagger$\citet{Kaluza2010}, combined cargo network.}
+\end{tabularx}}
+\end{table*}
+
+\subsection{Weighted clustering and KNN}
+
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/02_weighted_clustering.png}
+    \caption{Weighted clustering $C_w(k)$}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/02_weighted_knn.png}
+    \caption{Weighted KNN $k_\text{nn}^w(k)$}
+  \end{subfigure}
+  \caption{Weighted structural profiles \citep{Barrat2004}.
+    (\textit{a})~Weighted clustering is two orders of magnitude below
+    unweighted $C(k)$: triangles are structurally present but
+    most traffic concentrates on a few heavy routes.
+    (\textit{b})~Weighted KNN declines with $k$: hubs' heavy
+    connections go to lower-traffic ports.}
+  \label{fig:wclustering}
+\end{figure*}
+
+The large gap between unweighted ($C\approx0.52$) and weighted
+($C_w\approx0.0002$) clustering (figure~\ref{fig:wclustering}a)
+is a hallmark of hub-and-spoke structure: many triangles exist
+topologically but the actual traffic through them is negligible.
+Most voyage volume concentrates on the handful of routes connecting
+major container hubs, leaving the majority of triangles
+effectively ``dark'' in traffic terms.
+
+\subsection{Top ports by traffic strength}
+
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/02_top_ports_strength_2015.png}
+    \caption{2015}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/02_top_ports_strength_2025.png}
+    \caption{2025}
+  \end{subfigure}
+  \caption{Top-25 ports by node strength (total voyage count) for
+    (\textit{a})~2015 and (\textit{b})~2025.}
+  \label{fig:topstrength}
+\end{figure*}
+
+Shanghai and Rotterdam--Maasvlakte dominate in both years
+(figure~\ref{fig:topstrength}).
+Rank--strength correlation $\rho\approx0.91$ between degree and
+strength confirms that high-degree hubs also carry the most
+aggregate traffic.
+Total voyages grew $+9.7\%$ to 1.97 million in 2025, but this
+growth is unevenly distributed: the top-10 hubs by strength captured
+a disproportionate share of new traffic, deepening inequality.
+
+\subsection{Most active bilateral routes}
+
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/02_top_routes_2015.png}
+    \caption{2015}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/02_top_routes_2025.png}
+    \caption{2025}
+  \end{subfigure}
+  \caption{Top-30 bilateral routes by voyage count for
+    (\textit{a})~2015 and (\textit{b})~2025.
+    Max link weight grew from 10\,269 to 12\,779 ($+24.4\%$).}
+  \label{fig:toproutes}
+\end{figure*}
+
+The heaviest routes are overwhelmingly intra-regional---North Sea,
+East Asia, and the Mediterranean---with a handful of inter-regional
+links connecting Chinese and European hub clusters
+(figure~\ref{fig:toproutes}).
+The maximum link weight grew $+24.4\%$ to 12\,779 voyages by 2025,
+reflecting dedicated mega-vessel services on a few arterial
+corridors.
+The composition of the top-30 routes is highly stable: route rank
+correlation $\rho\approx0.87$ between years.
+
+\subsection{Port trade specialisation}
+
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/02_port_specialisation_2015.png}
+    \caption{2015}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/02_port_specialisation_2025.png}
+    \caption{2025}
+  \end{subfigure}
+  \caption{Port trade specialisation: in-strength vs.\ out-strength
+    (log--log) coloured by asymmetry index
+    $A\!=\!(s_\text{out}\!-\!s_\text{in})/(s_\text{out}\!+\!s_\text{in})$.
+    Blue = net importer; red = net exporter.
+    Bar charts show the most asymmetric ports by $|A|$.}
+  \label{fig:specialisation}
+\end{figure*}
+
+The vast majority of high-strength ports cluster tightly along the
+diagonal ($|A|<0.002$), confirming they function as near-perfectly
+balanced transshipment relays (figure~\ref{fig:specialisation}).
+Asymmetric ports are predominantly low-volume, single-commodity
+terminals---bulk mineral exporters or energy import facilities---
+where directional traffic imbalance reflects their production or
+consumption role rather than transit.
+This pattern is stable between 2015 and 2025, suggesting port
+trade roles are structurally locked-in at decadal timescales.
+
+% ====================================================================
+\section{Centrality analysis}
+% ====================================================================
+
+\subsection{Betweenness centrality}
+
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/01_betweenness_centrality_2015.png}
+    \caption{2015: Shanghai leads ($\mathrm{BC}=0.075$)}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/01_betweenness_centrality_2025.png}
+    \caption{2025: Rotterdam overtakes ($\mathrm{BC}=0.078$)}
+  \end{subfigure}
+  \caption{Top-25 ports by betweenness centrality (BC), approximated
+    with $k=500$ random pivot nodes \citep{Brandes2001}.}
+  \label{fig:bc}
+\end{figure*}
+
+Shanghai leads BC in 2015 ($0.075$), followed by
+Rotterdam--Maasvlakte ($0.072$) and Antwerp ($0.056$)
+(figure~\ref{fig:bc}).
+By 2025, Rotterdam--Maasvlakte overtakes Shanghai ($0.078$ vs.\
+$0.077$), reflecting sustained growth of European transshipment.
+Ports such as Gibraltar and Skagen achieve disproportionately high
+BC relative to their degree, a signature of geographic chokepoint
+positions on major shipping lanes.
+Spearman rank correlation between BC and degree is
+$\rho\approx0.80$--$0.85$: BC captures routing bridgeness that
+degree alone cannot.
+
+\subsection{PageRank centrality}
+
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/01_pagerank_2015.png}
+    \caption{2015: Shanghai ($4.48\times10^{-3}$)}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/01_pagerank_2025.png}
+    \caption{2025: Shanghai ($3.84\times10^{-3}$)}
+  \end{subfigure}
+  \caption{Top-25 ports by PageRank (directed, unweighted,
+    damping $\alpha=0.85$) \citep{Page1999}.}
+  \label{fig:pagerank}
+\end{figure*}
+
+PageRank captures \textit{gateway importance}: a port fed by many
+important hubs scores highly even without lying on many shortest
+paths (figure~\ref{fig:pagerank}).
+Shanghai remains the top PageRank port in both years, while Pengerang
+(Malaysia) drops from 5th in 2015 to below the top-25 in 2025
+($5.51\times10^{-4}$), reflecting a major Southeast Asian hub shift.
+The three centrality measures are complementary: Spearman
+$\rho(\text{PR, degree})\approx0.88$;
+$\rho(\text{PR, BC})\approx0.72$;
+$\rho(\text{BC, degree})\approx0.82$.
+
+\subsection{k-core decomposition}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/01_kcore_decomposition.png}
+  \caption{k-core decomposition \citep{Seidman1983}.
+    (\textit{a})~k-shell size distribution.
+    (\textit{b})~Cumulative node fraction vs.\ $k$.
+    (\textit{c})~Coreness vs.\ degree (2015).
+    Maximum core $k_\text{max}=74$ (2015), $72$ (2025), dominated by
+    East Asian ports.}
+  \label{fig:kcore}
+\end{figure*}
+
+The innermost core ($k_\text{max}=74$) identifies the dense backbone:
+ports include Tianjin, Taichung, Daesan (South Korea), Weihai, and
+Shenzhen---all East Asian (figure~\ref{fig:kcore}).
+This confirms the central role of intra-Asia container shipping in
+the global network backbone.
+The slight contraction to $k_\text{max}=72$ over the decade
+signals a marginal weakening of the densest core, consistent with
+route consolidation onto fewer mega-vessel services.
+The power-law-like coreness--degree scatter in panel~(c) confirms
+that high-degree nodes are necessary but not sufficient for high
+coreness: geographic positioning in a dense local neighbourhood
+also matters.
+
+% ====================================================================
+\section{Temporal analysis: 2015 vs.\ 2025}
+% ====================================================================
+
+\subsection{Structural change overview}
+
+\begin{table*}[t]
+\centering
+\caption{Full structural comparison: 2015 vs.\ 2025.}
+\label{tab:temporal}
+{\small
+\begin{tabularx}{\textwidth}{@{}lCCC@{}}
+\toprule
+\rowcolor{TableH}
+\textbf{Metric} & \textbf{2015} & \textbf{2025} & \textbf{Change} \\
+\midrule
+\multicolumn{4}{@{}l@{}}{\footnotesize\itshape Topology} \\
+Nodes $N$            & 7\,097      & 7\,717      & $+$8.7\%    \\
+Directed edges       & 188\,545    & 182\,300    & $-$3.3\%    \\
+Directed density     & 0.003744    & 0.003062    & $-$18.2\%   \\
+Connected components & 8           & 5           & $-$37.5\%   \\
+SCCs (directed)      & 219         & 203         & $-$7.3\%    \\[3pt]
+\multicolumn{4}{@{}l@{}}{\footnotesize\itshape Degree \& connectivity} \\
+Mean degree          & 41.07       & 36.15       & $-$12.0\%   \\
+Clustering $C$       & 0.5223      & 0.4884      & $-$6.5\%    \\
+Path length $L$      & 3.26        & 3.57        & $+$8.7\%    \\
+Assortativity $r$    & $-$0.069    & $-$0.008    & $+$88.5\%   \\[3pt]
+\multicolumn{4}{@{}l@{}}{\footnotesize\itshape Traffic} \\
+Total voyages        & 1\,791\,795 & 1\,965\,325 & $+$9.7\%    \\
+$\langle J\rangle$   & 9.50        & 10.78       & $+$13.4\%   \\
+Max link weight      & 10\,269     & 12\,779     & $+$24.4\%   \\[3pt]
+\multicolumn{4}{@{}l@{}}{\footnotesize\itshape Mesoscale} \\
+Communities $c$      & 28          & 34          & $+$21.4\%   \\
+Modularity $Q$       & 0.699       & 0.720       & $+$3.0\%    \\
+\bottomrule
+\end{tabularx}}
+\end{table*}
+
+Table~\ref{tab:temporal} reveals the \textit{traffic-concentration
+paradox}: total voyages grew $+9.7\%$ while the number of routes
+fell $-3.3\%$ and mean degree fell $-12.0\%$.
+More ships are traversing fewer routes, each carrying heavier
+traffic---directly consistent with the industry-wide trend of
+mega-vessel deployment \citep{Notteboom2012,Liu2025}.
+
+\subsection{Distribution shifts}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/03_distribution_comparison.png}
+  \caption{Complementary CDFs of degree, in-degree, and edge weight
+    for 2015 (steelblue) and 2025 (orange).
+    Kolmogorov--Smirnov tests: all shifts significant at
+    $p<10^{-4}$.}
+  \label{fig:distr}
+\end{figure*}
+
+All three distributions shift significantly between years
+(figure~\ref{fig:distr}).
+The degree CCDF shifts leftward (fewer connections per port) while
+the weight CCDF shifts rightward (heavier individual routes).
+These simultaneous shifts in opposite directions are the quantitative
+signature of the traffic-concentration paradox: the network
+reconfigures from many light routes to fewer heavy ones.
+
+\subsection{Network overlap and edge Jaccard similarity}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/03_overlap.png}
+  \caption{Network overlap between 2015 and 2025: Jaccard similarity
+    of node and edge sets, and the fraction of traffic on
+    persistent routes.}
+  \label{fig:overlap}
+\end{figure}
+
+Despite the decade gap, a large core of routes persists between years
+(figure~\ref{fig:overlap}).
+The high node-set overlap ($>$85\%) confirms that the port universe
+is essentially stable; it is the edge set that changes.
+Critically, persistent routes carry the \textit{majority} of total
+traffic, implying that the network's structural core---the
+high-traffic arteries---is highly stable, while peripheral
+low-traffic routes appear and disappear.
+
+\subsection{Route weight changes}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/03_route_changes.png}
+  \caption{Distribution of log-ratio
+    $\log_2(w_{2025}/w_{2015})$ for persistent routes.
+    Near-symmetric distribution indicates balanced intensification
+    and reduction, but with increased variance.}
+  \label{fig:routechanges}
+\end{figure}
+
+The log-ratio distribution for persistent routes is approximately
+symmetric around zero (figure~\ref{fig:routechanges}): on average,
+routes neither gain nor lose traffic.
+However, the increased variance indicates polarisation---some routes
+became dramatically busier while others nearly ceased.
+This ``route bifurcation'' is consistent with shipper consolidation
+onto fewer carriers on main corridors, while marginal routes lose
+traffic to larger hub calls.
+
+\subsection{Port importance evolution}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/03_port_evolution.png}
+  \caption{Rank evolution of port strength for the top-50 ports.
+    Hub rankings are remarkably stable ($\rho\approx0.93$),
+    with notable risers (Ningbo, Piraeus) and fallers (Pengerang).}
+  \label{fig:portevolution}
+\end{figure}
+
+The Spearman rank correlation $\rho\approx0.93$ between 2015 and
+2025 port strength rankings (figure~\ref{fig:portevolution}) is
+strikingly high over a decade of major geopolitical and economic
+disruptions.
+Notable risers include Ningbo-Zhoushan (now the world's busiest
+port by tonnage) and Piraeus (Chinese investment through
+COSCO Shipping).
+Pengerang's steep decline reflects the scaling-back of the
+Pengerang Integrated Petroleum Complex following the 2019 fire.
+
+\subsection{New and lost ports}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/03_new_lost_ports.png}
+  \caption{Characterisation of new ports (in 2025 only) and lost
+    ports (in 2015 only).
+    Both groups are dominated by low-degree, low-strength peripheral
+    nodes consistent with marginal terminals entering/leaving
+    service.}
+  \label{fig:newlost}
+\end{figure}
+
+New and lost ports are overwhelmingly peripheral, low-degree nodes
+(figure~\ref{fig:newlost}).
+This confirms that the network's structural changes are driven by the
+appearance and disappearance of marginal terminals---small coastal
+facilities and single-berth terminals---rather than
+any reorganisation of major hubs.
+The 620 new ports in 2025 reflect expanding coverage in emerging
+markets (Southeast Asia, West Africa); the lost ports reflect
+terminal consolidation in mature markets.
+
+\subsection{Traffic concentration}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/03_lorenz_gini.png}
+  \caption{Lorenz curves for edge weights (left), node strengths
+    (centre), and degree (right).
+    Gini coefficients exceed 0.85 for edge weights in both years.
+    All three Gini values increased from 2015 to 2025.}
+  \label{fig:lorenz}
+\end{figure*}
+
+Approximately 5\% of routes carry the majority of total voyage
+traffic (figure~\ref{fig:lorenz}).
+This extreme inequality---Gini $>0.85$ for edge weights---is
+substantially more concentrated than income inequality in the most
+unequal societies (Gini $\approx0.6$).
+The 2015-to-2025 increase in all three Gini coefficients is the
+clearest quantitative indicator of the traffic-concentration paradox.
+
+\subsection{Reciprocity and route directionality}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/03_reciprocity.png}
+  \caption{Reciprocity and directional asymmetry of bilateral routes.
+    Reciprocity $\approx0.76$, stable across years.
+    The asymmetry distribution is unimodal and centred near zero.}
+  \label{fig:reciprocity}
+\end{figure}
+
+Network reciprocity is $\approx0.76$ and is nearly unchanged
+($-0.003$) between years (figure~\ref{fig:reciprocity}).
+This confirms the strongly bidirectional nature of cargo shipping:
+almost all major routes operate in both directions with roughly
+similar volumes.
+The unimodal, near-symmetric asymmetry distribution shows that
+strongly one-directional routes are rare, with the few exceptions
+being dedicated tanker or bulk-cargo corridors.
+
+\subsection{Network robustness}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/03_robustness.png}
+  \caption{GCC fraction vs.\ removed-node fraction under targeted
+    (highest-degree first) and random attack.
+    Targeted attack causes rapid collapse; random removal has
+    negligible effect.}
+  \label{fig:robustness}
+\end{figure}
+
+The GCSN is highly robust to random failures but fragile under
+targeted attack (figure~\ref{fig:robustness}): removing the top
+15\% of degree hubs reduces the GCC below 50\%.
+This robustness--vulnerability dichotomy is characteristic of
+heterogeneous networks \citep{Barabasi1999} and has critical
+implications for pandemic disease spread and supply-chain planning.
+The 2025 network is marginally more vulnerable under targeted
+attack, consistent with the lower mean degree.
+
+\subsection{Chokepoint disruption analysis}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/03_chokepoint_disruption.png}
+  \caption{Impact of removing individual strategic ports on
+    (\textit{a})~GCC fraction reduction and
+    (\textit{b})~APL increase.
+    Shanghai causes the largest GCC reduction (0.113\%, 2015).}
+  \label{fig:chokepoints}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Chokepoint disruption: single-port removal impact.}
+\label{tab:chokepoints}
+{\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\rowcolor{TableH}
+ & \multicolumn{2}{c}{$\Delta$GCC (\%)} &
+   \multicolumn{2}{c}{$\Delta\langle L\rangle$} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Port & 2015 & 2025 & 2015 & 2025 \\
+\midrule
+Shanghai  & 0.113 & 0.065 & 0.044 & 0.022 \\
+Rotterdam & 0.000 & 0.039 & 0.047 & 0.015 \\
+Singapore & 0.014 & 0.026 & 0.030 & 0.007 \\
+Busan     & 0.000 & 0.013 & 0.028 & 0.003 \\
+Hamburg   & 0.028 & 0.013 & 0.017 & 0.004 \\
+Port Said & 0.000 & 0.013 & 0.021 & 0.005 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+No single port removal fragments the network
+(table~\ref{tab:chokepoints}, figure~\ref{fig:chokepoints}):
+the GCSN has no single point of failure for connectivity.
+However, APL increases confirm significant efficiency degradation.
+Rotterdam's APL impact ($\Delta L=0.047$) exceeds Shanghai's in 2015,
+reflecting its critical gateway role for European inbound cargo.
+Shanghai's declining GCC impact (halved to 0.065\% by 2025) suggests
+the network adapted around it as Ningbo and other Chinese hubs grew.
+
+\subsection{Hub stability}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/03_hub_stability.png}
+  \caption{Spearman rank correlation of port strength (left) and
+    degree (right) between years.
+    $\rho\approx0.93$ for both measures: hub rankings are
+    remarkably stable across the decade.}
+  \label{fig:stability}
+\end{figure}
+
+The high rank stability ($\rho\approx0.93$, figure~\ref{fig:stability})
+despite a decade of major disruptions is a striking result.
+The COVID-19 pandemic (2020), US--China tariff wars, and the
+Suez Canal blockage (2021) all generated short-term disruptions
+in the news cycle, yet the structural hierarchy of ports is almost
+entirely preserved.
+This suggests that port infrastructure investments and shipping
+alliances create a ``structural lock-in'' that resists rapid
+reorganisation.
+
+\subsection{Summary dashboard}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/03_summary_dashboard.png}
+  \caption{Visual summary dashboard: eight key metrics side-by-side
+    for 2015 and 2025.
+    The dashboard encapsulates the traffic-concentration paradox
+    (more voyages, fewer routes), the robustness--vulnerability
+    trade-off, and increasing modularity.}
+  \label{fig:dashboard}
+\end{figure*}
+
+The summary dashboard (figure~\ref{fig:dashboard}) provides an
+at-a-glance synthesis of the decade's structural evolution.
+The simultaneous leftward shift in the degree distribution and
+rightward shift in the weight distribution---visible in the same
+panel---is the clearest visual representation of the
+traffic-concentration paradox.
+
+% ====================================================================
+\section{Community detection and analysis}
+% ====================================================================
+
+\subsection{Detection method and summary}
+
+Louvain community detection \citep{Blondel2008} was applied to
+$G_u$ for both years.
+
+\begin{table}[t]
+\centering
+\caption{Community detection summary.}
+\label{tab:communities}
+{\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\rowcolor{TableH}
+\textbf{Metric} & \textbf{2015} & \textbf{2025} & \textbf{2007\,$^\dagger$} \\
+\midrule
+Algorithm           & Louv. & Louv. & L--N  \\
+Communities $c$     & 28    & 34    & 12/7/6 \\
+Modularity $Q$      & 0.699 & 0.720 & 0.605--0.716 \\
+Largest (ports)     & 1\,990 & 1\,735 & --- \\
+Intra-edge ratio    & 70.2\% & 67.6\% & --- \\
+Intra-traffic ratio & 84.2\% & 83.4\% & --- \\
+Coverage            & 0.702  & 0.676  & --- \\
+Performance         & 0.860  & 0.894  & --- \\
+Mean conductance    & 0.096  & 0.094  & --- \\
+Stable ($J{\geq}0.25$) & 14/28 & ---  & --- \\
+\bottomrule
+\multicolumn{4}{@{}l@{}}{\footnotesize
+  $^\dagger$\citet{Kaluza2010}; Louv.\ = Louvain;
+  L--N = Leicht--Newman.}
+\end{tabular}}
+\end{table}
+
+The community count grew from 28 to 34 ($+21\%$) and modularity
+from $Q=0.699$ to $0.720$ (table~\ref{tab:communities}): regional
+trade blocs tightened over the decade.
+These values exceed the original paper's $Q=0.605$--$0.716$,
+suggesting GFW combined data produces at least equally well-defined
+communities.
+Intra-community traffic remains near-constant at $\approx84\%$,
+confirming that the vast majority of global shipping is regional.
+
+\subsection{Community size and strength}
+
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/04_community_size.png}
+    \caption{Community size (ports)}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/04_community_strength.png}
+    \caption{Community traffic strength}
+  \end{subfigure}
+  \caption{(\textit{a})~Community size distribution: a single giant
+    community coexists with many small peripheral ones.
+    (\textit{b})~Community strength: the giant community captures
+    a disproportionate share of all voyage traffic.}
+  \label{fig:commsizes}
+\end{figure*}
+
+A single giant community ($\approx$1\,800--2\,000 ports) dominates
+the size distribution (figure~\ref{fig:commsizes}a), surrounded by
+a power-law-like tail of smaller communities.
+The giant community's traffic share (panel~b) exceeds its port share,
+confirming the ``mega-hub'' effect: the core community contains the
+world's busiest ports and thus captures the majority of total traffic.
+
+\subsection{Community structural profile}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/04_community_profile_scatter.png}
+  \caption{Per-community profile: internal density vs.\ size,
+    coloured by mean conductance.
+    Smaller communities are denser and better-separated; the giant
+    community is sparse with porous boundaries.}
+  \label{fig:commprofile}
+\end{figure}
+
+The inverse relationship between community size and internal density
+(figure~\ref{fig:commprofile}) is a standard feature of
+hierarchically-structured networks.
+Small communities (e.g.\ Baltic Sea cluster, Oceania cluster) are
+highly cohesive geographic blocs.
+The giant community is structurally porous---it contains ports from
+multiple geographic regions connected through major transshipment
+hubs, and correspondingly has lower internal density and higher
+conductance.
+
+\subsection{Inter-community traffic}
+
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/04_community_heatmap_2015.png}
+    \caption{2015}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/04_community_heatmap_2025.png}
+    \caption{2025}
+  \end{subfigure}
+  \caption{Inter-community traffic matrices (log scale) for
+    (\textit{a})~2015 and (\textit{b})~2025.
+    Diagonal dominance: 84\% of all traffic is intra-community.}
+  \label{fig:heatmap}
+\end{figure*}
+
+The diagonal-dominant structure (figure~\ref{fig:heatmap}) confirms
+strong intra-community flows: 84\% of all voyages remain within
+the same community.
+The dominant off-diagonal block connects the European
+(Rotterdam-hub) and East-Asian (Shanghai-hub) communities,
+representing the trans-Eurasian container trunk route.
+The slight tightening of diagonal dominance in 2025 (despite more
+communities) reflects the increasing modularity: while trade blocs
+split into more sub-groups, each sub-group becomes more
+self-contained.
+
+\subsection{Community flow balance}
+
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/04_community_flow_2015.png}
+    \caption{2015}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/04_community_flow_2025.png}
+    \caption{2025}
+  \end{subfigure}
+  \caption{Community-level flow balance (net importer/exporter) for
+    (\textit{a})~2015 and (\textit{b})~2025.
+    Most communities are near-balanced; a few are specialised net
+    exporters or importers.}
+  \label{fig:commflow}
+\end{figure*}
+
+Most communities are near-balanced in directed voyage flow
+(figure~\ref{fig:commflow}).
+Specialised net-exporter communities tend to correspond to
+resource-extraction regions (e.g.\ Australasian bulk commodities,
+Persian Gulf energy corridors), while net-importer communities
+reflect manufacturing consumption hubs.
+The flow-balance landscape is broadly stable between 2015 and 2025,
+consistent with the structural lock-in observed in port rankings.
+
+\subsection{Community conductance and quality}
+
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/04_conductance_2015.png}
+    \caption{2015: mean $\varphi=0.096$}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\linewidth}
+    \includegraphics[width=\linewidth]{Figures/04_conductance_2025.png}
+    \caption{2025: mean $\varphi=0.094$}
+  \end{subfigure}
+  \caption{Community conductance distributions for (\textit{a})~2015
+    and (\textit{b})~2025.
+    Low conductance ($\varphi\approx0.09$) confirms well-separated
+    communities with minimal cross-boundary traffic.}
+  \label{fig:conductance}
+\end{figure*}
+
+The low mean conductance $\varphi\approx0.09$--$0.10$
+(figure~\ref{fig:conductance}) confirms that Louvain communities are
+well-separated: cross-boundary traffic is modest relative to
+within-community traffic.
+The slight decrease from $0.096$ to $0.094$ indicates marginally
+better community isolation in 2025, consistent with the modularity
+increase.
+Communities with high conductance tend to be geographically
+diffuse communities that bridge multiple trade regions.
+
+\subsection{Community persistence}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/04_community_jaccard.png}
+  \caption{Jaccard similarity matrix between 2015 and 2025 communities
+    (top-20 sub-matrix).
+    14/28 communities are stable ($J\geq0.25$).}
+  \label{fig:jaccard}
+\end{figure}
+
+Fourteen of 28 communities (50\%) persist from 2015 to 2025 with
+Jaccard similarity $J\geq0.25$ (figure~\ref{fig:jaccard}).
+The most stable are geographically compact blocs: the European
+(Rotterdam hub, $J=0.602$), Scandinavian (Canada hub, $J=0.760$),
+and Pan-American (Panama hub, $J=0.510$) clusters.
+The remaining 14 communities dissolved or split, often reflecting
+the fragmentation of larger regional blocs into smaller, more
+specialised trade clusters---another facet of the rising modularity
+trend.
+
+% ====================================================================
+\section{Motif analysis}
+% ====================================================================
+
+Motif analysis quantifies the statistical over- or
+under-representation of each of the 16 directed triad isomorphism
+classes \citep{Holland1970} relative to a degree-preserving null
+model (100 randomised networks via directed edge swapping).
+Z-scores $Z=(f_\text{real}-\bar{f}_\text{rand})/\sigma_\text{rand}$
+measure significance.
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/05_motif_zscores.png}
+  \caption{Motif Z-scores for all 15 non-null triad classes
+    \citep{Holland1970}.
+    2015 = blue; 2025 = orange.
+    Dashed lines: $Z=\pm2$ significance thresholds.}
+  \label{fig:motifs}
+\end{figure*}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/05_motif_paper13_zscores.png}
+  \caption{Zoomed comparison for the 13 triad types highlighted
+    in \citet{Kaluza2010} figure~4.
+    The qualitative pattern closely matches the original study.}
+  \label{fig:motifpaper}
+\end{figure*}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/05_motif_frequencies.png}
+  \caption{Absolute motif counts for 2015 and 2025.
+    ``012'' (no edges) and ``102'' (mutual pair) dominate due
+    to network sparsity; ``300'' (complete triad) is small in
+    absolute terms but enormously over-represented.}
+  \label{fig:motiffreq}
+\end{figure*}
+
+\begin{table}[t]
+\centering
+\caption{Selected triadic census Z-scores.
+  $\star$ = types in \citet{Kaluza2010} figure~4.}
+\label{tab:motifs}
+{\small
+\begin{tabular}{@{}llccc@{}}
+\toprule
+\rowcolor{TableH}
+\textbf{Triad} & \textbf{Description} &
+$\boldsymbol{Z_{15}}$ & $\boldsymbol{Z_{25}}$ & \textbf{Status} \\
+\midrule
+012            & No edges        & $-$598  & $-$649  & under \\
+102            & Mutual pair     & $+$594  & $+$642  & over  \\
+021D$^\star$   & Down fan        & $-$298  & $-$279  & under \\
+021U$^\star$   & Up fan          & $-$292  & $-$276  & under \\
+021C$^\star$   & Chain           & $-$294  & $-$274  & under \\
+111D$^\star$   & Mixed           & $+$131  & $+$116  & over  \\
+111U$^\star$   & Mixed (flip)    & $+$128  & $+$119  & over  \\
+030T$^\star$   & Triangle (T)    & $-$105  & $-$78   & under \\
+030C$^\star$   & Cycle           & $-$114  & $-$92   & under \\
+201$^\star$    & 2 mutuals       & $+$373  & $+$404  & over  \\
+120D$^\star$   & In-star mut.    & $+$181  & $+$205  & over  \\
+120U$^\star$   & Out-star mut.   & $+$147  & $+$149  & over  \\
+120C$^\star$   & Chain mutual    & $+$99   & $+$108  & over  \\
+210$^\star$    & 5 arcs          & $+$439  & $+$457  & over  \\
+300$^\star$    & Complete triad  & $+$1081 & $+$1252 & over  \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Figures~\ref{fig:motifs}--\ref{fig:motiffreq} and
+table~\ref{tab:motifs} together replicate and extend the motif
+analysis of \citet{Kaluza2010} figure~4.
+The complete triad (300) has by far the largest Z-score
+($+1081$ in 2015, $+1252$ in 2025), confirming that
+tightly-connected triangles among hub ports are a defining structural
+motif of the GCSN.
+Sparse patterns (021D/U/C: fan and chain triads) are strongly
+under-represented, consistent with the rich-club structure where
+hubs prefer to connect directly to each other rather than through
+intermediaries.
+The slight increase in $|Z|$ for most classes between 2015 and
+2025 is consistent with rising modularity: tighter communities
+generate more local cliques (increasing over-representation of
+300/210/201) while inter-community fan patterns become even rarer.
+The qualitative profile (figure~\ref{fig:motifpaper}) matches the
+original study almost exactly, providing strong cross-source
+validation.
+
+% ====================================================================
+\section{Country-level analysis}
+% ====================================================================
+
+\subsection{Network construction and overview}
+
+The three-letter ISO prefix of each GFW port ID
+(e.g.\ \texttt{chn-shanghai}$\to$CHN) is parsed to aggregate the
+port-level edge list to a country-level network.
+Self-loops (intra-country voyages) are removed.
+
+\begin{table}[t]
+\centering
+\caption{Country-level network summary.}
+\label{tab:country}
+{\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\rowcolor{TableH}
+\textbf{Metric} & \textbf{2015} & \textbf{2025} & \textbf{Change} \\
+\midrule
+Countries (nodes) & 201    & 203    & $+$1.0\%  \\
+Directed edges    & 7\,417 & 7\,431 & $+$0.2\%  \\
+Mean degree       & 45.68  & 45.43  & ---       \\
+Reciprocity       & 0.762  & 0.759  & ---       \\
+Clustering $C$    & 0.703  & 0.707  & ---       \\
+GCC size          & 100\%  & 100\%  & ---       \\
+Communities       & 8      & 7      & $-$1      \\
+Modularity $Q$    & 0.566  & 0.586  & $+$3.5\%  \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+The country-level network (table~\ref{tab:country}) is extremely
+dense (mean degree 45.7) and nearly fully bidirectional
+(reciprocity 0.76): almost every country pair that trades in one
+direction also trades in the reverse.
+The GCC covers 100\% of countries---all trading nations are
+connected in a single component.
+Higher clustering ($C\approx0.70$ vs.\ $0.52$ at port level)
+reflects tight regional trade blocs at the national scale.
+
+\subsection{Top countries by shipping strength}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/06_top_countries_strength.png}
+  \caption{Top-20 countries by total shipping strength for 2015
+    (top) and 2025 (bottom).
+    China dominates by a large margin; Netherlands, Belgium, Japan,
+    and South Korea follow.}
+  \label{fig:topcountries}
+\end{figure}
+
+China's dominance is overwhelming in both years
+(figure~\ref{fig:topcountries}), with a strength more than twice
+that of the second-ranked Netherlands.
+The top-5 rankings are stable---Netherlands, Belgium, Japan, South
+Korea---reflecting the entrenched positions of major hub-port
+nations.
+The ranking of the United States falls slightly relative to
+Southeast Asian nations, consistent with the US--China trade
+tensions redistributing some trans-Pacific volume to intra-Asian
+routes.
+
+\subsection{Country strength and degree distributions}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/06_country_distributions.png}
+  \caption{Country-level strength and degree distributions
+    (log--log) for 2015 and 2025.
+    Both are heavy-tailed; the distributions are nearly identical
+    between years, confirming structural stability.}
+  \label{fig:countrydistr}
+\end{figure}
+
+Country-level distributions are heavy-tailed
+(figure~\ref{fig:countrydistr}) with a small number of dominant
+trading nations.
+The near-identical shapes between 2015 and 2025 at the country
+level---in contrast to the significant shifts at the port level
+(figure~\ref{fig:distr})---suggests that national trade hierarchies
+are structurally more stable than individual port rankings.
+
+\subsection{Temporal change at country level}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/06_country_temporal_change.png}
+  \caption{Country shipping strength change 2015--2025.
+    \textit{Left}: 2015 vs.\ 2025 scatter (log--log);
+    diagonal = no change.
+    \textit{Right}: Countries with the largest percentage
+    gain (green) or loss (red).}
+  \label{fig:countrychange}
+\end{figure}
+
+Vietnam, India, and Gulf states show the largest percentage gains
+(figure~\ref{fig:countrychange}), consistent with industrial
+growth and diversification in these economies.
+Several legacy East Asian exporters show relative decline,
+reflecting production shifts within the region.
+The log-log scatter's tight clustering around the diagonal for
+large-strength countries confirms that major trading nations
+maintained their positions; the most volatile points are small
+trading nations with low base volumes.
+
+\subsection{Country flow balance}
+
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{0.28\textwidth}
+    \includegraphics[height=0.72\textheight, keepaspectratio]{Figures/06_country_flow_balance_2015.png}
+    \caption{2015}
+  \end{subfigure}
+  \hspace{1.8cm}
+  \begin{subfigure}[b]{0.28\textwidth}
+    \includegraphics[height=0.72\textheight, keepaspectratio]{Figures/06_country_flow_balance_2025.png}
+    \caption{2025}
+  \end{subfigure}
+  \caption{Country flow balance: net importer vs.\ exporter
+    classification in (\textit{a})~2015 and (\textit{b})~2025.
+    Most large nations are near-balanced transshipment hubs.
+    Asymmetric outliers are typically commodity-specialist terminals
+    (bulk mineral exporters or energy import facilities).}
+  \label{fig:countrybalance}
+\end{figure*}
+
+Most large countries are near-balanced transshipment nodes
+(figure~\ref{fig:countrybalance}).
+Pronounced asymmetries appear for commodity-specialist economies:
+net exporters include bulk mineral and energy producers
+(e.g.\ Australia, Saudi Arabia), while net importers include
+manufacturing-heavy import consumers.
+The flow-balance map is highly stable between years, confirming
+that national trade roles---like port rankings---are structurally
+locked in at decadal timescales.
+
+\subsection{Country-level communities}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/06_country_communities.png}
+  \caption{Louvain trade-bloc communities at country level:
+    2015 (8 blocs, $Q=0.566$) and 2025 (7 blocs, $Q=0.586$).
+    Communities map to geopolitical regions: East Asia,
+    Europe--Mediterranean, Americas, Persian Gulf, Oceania,
+    Southeast Asia, and Africa.}
+  \label{fig:countrycomm}
+\end{figure}
+
+The seven communities in 2025 (reduced from 8, with higher $Q$)
+correspond to recognisable geopolitical regions
+(figure~\ref{fig:countrycomm}).
+The consolidation from 8 to 7 blocs reflects integration of
+adjacent regions---likely the absorption of the South Asian bloc
+into the broader East Asian trade community following increased
+Indian Ocean container traffic.
+The higher modularity at the country level ($Q=0.57$--$0.59$)
+vs.\ port level ($Q=0.70$--$0.72$) appears paradoxical but reflects
+the difference in scale: at the port level, tight local clusters
+dominate; at the country level, broader geographic blocs emerge.
+
+\subsection{Country PageRank and centrality}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/06_country_pagerank.png}
+  \caption{Top-20 countries by weighted PageRank ($\alpha=0.85$)
+    for 2015 and 2025.
+    China, Netherlands, Belgium, Japan, and Germany lead.
+    Germany and UK rank higher in PR than raw strength,
+    reflecting their European gateway roles.}
+  \label{fig:countrypr}
+\end{figure}
+
+The PageRank ranking (figure~\ref{fig:countrypr}) reveals European
+gateway nations---Germany, UK, France---ranking disproportionately
+high relative to their raw shipping volumes.
+This reflects their role as redistribution hubs: they receive
+large container volumes from deep-sea lines and re-export via
+feeder services to smaller European and Mediterranean ports.
+China's PageRank dominance further confirms that it is the single
+most important node in the global trading network by every measure.
+
+\subsection{Trade concentration}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{Figures/06_country_lorenz.png}
+  \caption{Lorenz curves for country-level shipping strength in
+    2015 and 2025.
+    Country Gini is substantially lower than port Gini
+    (figure~\ref{fig:lorenz}); a mild increase from 2015 to 2025
+    signals growing nation-level inequality.}
+  \label{fig:countrylorenz}
+\end{figure}
+
+Country-level trade concentration (figure~\ref{fig:countrylorenz})
+is substantially less extreme than port-level concentration
+(figure~\ref{fig:lorenz}).
+At the country level, the top 20\% of nations account for
+$\sim70\%$ of traffic---high but far from the port-level
+concentration where 5\% of routes carry the majority.
+The mild Gini increase from 2015 to 2025 at the national level
+indicates that the traffic-concentration paradox observed at the
+port scale partially aggregates away when viewed nationally.
+
+% ====================================================================
+\section{Discussion}
+% ====================================================================
+
+\subsection{Replication fidelity}
+
+Our results replicate all qualitative conclusions of
+\citet{Kaluza2010}: exponential degree distribution, small-world
+clustering, superlinear strength--degree scaling, geographically
+coherent modular communities, and over-representation of
+clique-like triadic motifs.
+Quantitative differences (longer $L$, larger $\mu$ and $\eta$) are
+entirely attributable to the larger port universe (7\,097 vs.\ 951
+ports) and cross-type aggregation.
+The strength--degree scaling exponent $\alpha=1.346$ (2025) is
+almost identical to the paper's $\alpha=1.36$, providing strong
+cross-source validation.
+
+\subsection{Traffic-concentration paradox}
+
+The central 2015--2025 finding is a \textit{traffic-concentration
+paradox}: $+9.7\%$ voyages on $-3.3\%$ routes, with mean degree
+$-12.0\%$ and max link weight $+24.4\%$.
+This is entirely consistent with the post-2015 deployment of
+ultra-large container vessels (ULCVs, $>$18\,000 TEU), which
+require deep-water hub ports and generate dramatically higher
+per-call voyage counts
+\citep{Notteboom2012,Liu2025}.
+The structural consequence is a network that is simultaneously more
+\textit{efficient per route} (higher $\langle J\rangle$: $9.5\to10.8$)
+but less \textit{robust} (higher APL, lower clustering).
+
+\subsection{Growing modularity}
+
+Rising modularity ($Q: 0.699\to0.720$, community count $28\to34$)
+indicates tightening regional trade blocs.
+This is consistent with US--China trade tensions (post-2018 tariffs)
+and pandemic-induced near-shoring, both of which promote
+intra-bloc relative to inter-bloc traffic.
+The 50\% community stability confirms a stable geographic core
+that evolves only gradually, while 14 communities dissolved or
+fragmented---likely smaller regional sub-structures responding to
+trade-policy shifts.
+
+\subsection{Limitations}
+
+No per-vessel-type breakdown is possible because GFW aggregates
+\texttt{CARGO} and \texttt{CONTAINER} types.
+Only two snapshots are available; a year-by-year panel would
+enable event-based change-point detection (COVID-19 shock,
+Suez Canal blockage).
+Betweenness centrality and APL estimates are approximations via
+random sampling.
+No geographic coordinates are available in GFW port IDs,
+precluding spatial map visualisation and gravity-model validation.
+
+% ====================================================================
+\section{Conclusion}
+% ====================================================================
+
+We have presented a comprehensive replication and extension of
+\citeauthor{Kaluza2010}'s global cargo ship network analysis using
+GFW open data for 2015 and 2025.
+Key contributions:
+\begin{enumerate}
+  \item \textit{Full replication} of Kaluza et~al.\ Table~1 and
+        figure~2 on an independent, larger dataset.
+  \item \textit{Traffic-concentration paradox}: $+9.7\%$ voyages on
+        $-3.3\%$ routes, driven by mega-vessel deployment.
+  \item \textit{Centrality extensions}: PageRank identifies East
+        Asian gateway ports; k-core ($k_\text{max}=74$) shows
+        East Asian ports constitute the densest backbone.
+  \item \textit{Chokepoint resilience}: Shanghai is the most
+        critical single node; no port removal fragments the GCC.
+  \item \textit{50\% community stability} across the decade; rising
+        modularity indicates tighter regional blocs.
+  \item \textit{Country-level aggregation}: China dominates the
+        global trade network; 8 trade blocs consolidate to 7.
+  \item \textit{Port specialisation}: large hubs are balanced
+        transshipment relays; asymmetric ports are commodity-specialist
+        terminals.
+\end{enumerate}
+All source code and processed edge lists are available at the
+project repository.
+
+% ====================================================================
+\section*{Acknowledgements}
+% ====================================================================
+
+The authors thank the Global Fishing Watch project for open access
+to vessel-tracking data.
+Analysis used Python~3 with NetworkX \citep{Hagberg2008}, pandas,
+NumPy, SciPy, and Matplotlib.
+
+% ====================================================================
+\bibliographystyle{plainnat}
+\bibliography{references}
+% ====================================================================
+
+\end{document}
