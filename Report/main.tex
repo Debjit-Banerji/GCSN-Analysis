@@ -89,6 +89,9 @@
             urlcolor=TealLine,
             bookmarks=true]{hyperref}
 
+% ── Project repository link ──────────────────────────────────────────
+\newcommand{\projectrepo}{\url{https://github.com/Debjit-Banerji/GCSN-Analysis}}
+
 % ── Float parameters for two-column ─────────────────────────────────
 \setlength{\dbltextfloatsep}{8pt plus 2pt minus 2pt}
 \setlength{\dblfloatsep}{6pt plus 2pt minus 2pt}
@@ -1584,8 +1587,8 @@ trade-policy shifts.
 
 No per-vessel-type breakdown is possible because GFW aggregates
 \texttt{CARGO} and \texttt{CONTAINER} types.
-Only two snapshots are available; a year-by-year panel would
-enable event-based change-point detection (COVID-19 shock,
+We chose to use only two year snapshots (namely for 2015 and 2025). A year-by-year panel possibly would have
+enabled event-based change-point detection (COVID-19 shock,
 Suez Canal blockage).
 Betweenness centrality and APL estimates are approximations via
 random sampling.
@@ -1618,8 +1621,13 @@ Key contributions:
         transshipment relays; asymmetric ports are commodity-specialist
         terminals.
 \end{enumerate}
-All source code and processed edge lists are available at the
-project repository.
+
+% ====================================================================
+\section*{Data and code availability}
+% ====================================================================
+
+Source code and processed edge lists are available at the project
+repository: \projectrepo.
 
 % ====================================================================
 \section*{Acknowledgements}
